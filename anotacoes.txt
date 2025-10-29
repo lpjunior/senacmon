@@ -1,0 +1,133 @@
+Senacmon - Skeleton Conceitual
+
+1. Escopo do MVP
+    - Modo solo, 1 jogador por sessão.
+    - Escolha de Pokémon inicial com elemento água, fogo ou planta.
+    - Mapa lógico baseado em posições 1 a N, avançando por dado 1 a 6.
+    - Zonas do mapa: neutra, bônus, perda, batalha.
+    - Batalha com sistema de vantagem elemental estilo pedra, papel e tesoura.
+    - Apostas com berries; opção de batalha sem apostar.
+    - Captura pela Equipe Rocket, bloqueio de 2 rodadas.
+    - Partida termina por limite de rodadas ou saldo zerado.
+    - Histórico de ações do jogador.
+
+2. Glossário de Domínio
+    - Berries: moeda do jogo usada para apostas, inicia com 100.
+    - Elemento: sistema onde água vence fogo, fogo vence planta, planta vence água.
+    - Captura: Estado de restrição que impede o turno por 2 rodadas.
+    - Rodada: turno do jogador, envolve lançamento de dado e resolver a zona.
+    - Zona: tipo de espaço no mapa que determina a ação (neutra, bônus, perda, batalha).
+    - Mapa: trilha de posições numeradas onde o jogador avança. Cada posição tem uma zona associada.
+    - Batalha: evento que permite aposta e sorteio de Pokémon vencedor.
+    - Histórico: registro das ações e eventos ocorridos durante a partida.
+
+3. Entidades e Atributos
+    3.1 Player
+        - id; nome; barries; pokemon_inicial_id; rounds_restantes_captura; posicao_atual;
+          rodada_atual; status_jogo [ativo, finalizado]; historico_acoes.
+        - invariantes: berries nunca negativo; rounds_restantes_captura entre 0 e 2.
+
+    3.2 Pokemon
+        - id; nome; elemento [agua, fogo, planta]; numero_associado 1 a 9; sprite_url opcional.
+        - invariantes: numero_associado único no conjunto de seeds.
+
+    3.3 Mapa
+        - id; tamanho_total; distribuicao_zonas (lista de zonas por posição).
+        - invariantes: tamanho_total igual ao comprimento da distribuição.
+
+    3.4 Zona
+        - tipo [neutra, bonus, perda, batalha, captura]; parametros opcionais como valor_bonus e valor_perda.
+
+    3.5 Partida
+        - id; player_id; mapa_id; rodada_limite; data_inicio; data_fim; estado [em_andamento, finalizada]; resumo_final json.
+        - invariantes: uma partida ativa por jogador (MVP).
+
+    3.6 Batalha
+        - id; partida_id; rodada; player_pokemon_id; oponente_pokemon_id; houve_aposta booleano; aposta_valor;
+        aposta_opcoes lista de numeros escolhidos 1 ou 2; numero_sorteado; resultado [vitoria, derrota, sem_aposta];
+        multiplicador; berries_delta; detalhe_elemental json.
+        - invariantes: se houve_aposta verdadeiro, aposta_valor maior que zero.
+
+    3.7 TransacaoBerries
+        - id; player_id; partida_id; tipo [aposta_debito. aposta_credito, bonus, penalidade, ajuste]; valor;
+        saldo_resultante; referencia_tipo; referencia_id; criado_em.
+        - invariantes: saldo_resultante coerente com o valor.
+
+    3.8 EventoRodada
+        - id; partida_id; rodada; tipo_evento [movimento, zona, batalha, captura, bonus, perda, skip];
+        payload json; mensagem_usuario.
+        - Objetivo: trilha de auditoria e histórico.
+
+4. Lógica de Zonas
+    4.1 Zona Neutra
+        - Sem efeito, apenas registra o evento.
+
+    4.2 Zona Bônus
+        - Ganha berries aleatórias entre 10 e 50.
+        - Registra transação de bônus.
+        - Mensagem positiva ao jogador.
+
+    4.3 Zona Perda
+        - Perde berries aleatórias entre 5 e 25.
+        - Registra transação de penalidade.
+        - Mensagem negativa ao jogador.
+
+    4.4 Zona Batalha
+        - Jogador escolhe uma ou duas opções de número associado a Pokémon.
+        - Define aposta minima de 10 berries se optar por apostar.
+        - Sorteia Pokémon oponente aleatório.
+        - Resolve batalha com base em vantagem elemental.
+        - Calcula resultado conforme aposta e vantagem elemental.
+
+    4.5 Zona Captura
+        - Jogador capturado pela Equipe Rocket.
+        - Bloqueio de ações por 2 rodadas.
+        - Registra evento de captura.
+
+5. Vantagem Elemental
+    Tabela:
+    - Água vence Fogo.
+    - Fogo vence Planta.
+    - Planta vence Água.
+    - Empate se mesmos elementos.
+
+    Aplicação no cálculo:
+    - Definir multiplicador base da aposta, exemplo apostar em 1 número paga 3 vezes, apostar em 2 numeros paga 1.8 vezes.
+    - Ajuste por vantagem elemental:
+        - Se elemento do jogador tem vantagem sobre o adversário, multiplicador recebe bônus de 0.5.
+        - Se elemento do jogador é desvantajoso, multiplicador reduz em 0.5.
+        - Se neutro, multiplicador permanece igual.
+    - Em modo sem aposta, não movimenta berries, apenas determina vencedor e registra o resultado simbólico.
+
+6. Regras de Aposta
+    - Saldo suficiente antes de confirmar aposta.
+    - Aposta minima por modalidade:
+        - Apostar em 1 número: minimo 10 berries.
+        - Apostar em 2 números: minimo 20 berries.
+    - Maximo por rodada para evitar estouros: 50 berries.
+    Em derrota com aposta, debitado somente o valor apostado.
+    Em vitória, crédito igual a aposta_valor vezes muiltiplicador efetivo.
+
+Senacmon - Skeleton Estrutural
+1. Arquitetura Geral
+    - Backend: Python com Django.
+    - Banco de Dados: PostgreSQL.
+    - ORM: Django ORM.
+    - Frontend: HTML5 e CSS3.
+    - Comunicação: RESTful APIs.
+
+senacmon/
+├─ src/
+│  ├─ config/              # projeto Django
+│  ├─ accounts/            # autenticação básica
+│  ├─ game/                # domínio do jogo, services e selectors
+│  ├─ wallet/              # carteira e transações de berries
+│  ├─ audit/               # trilha de auditoria
+│  ├─ api/                 # DRF e endpoints REST
+│  ├─ templates/           # templates Bootstrap
+│  └─ static/              # diretório reservado para assets
+├─ scripts/                # utilitários de banco e seeds
+├─ docker/                 # arquivos Docker
+├─ c/           # dependências por ambiente
+├─ Makefile                # atalhos de automação
+└─ README.md
