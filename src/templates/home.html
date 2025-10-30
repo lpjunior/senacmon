@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Senacmon, Home{% endblock %}
+{% block content %}
+<div class="p-4 bg-white rounded shadow-sm">
+  <h1 class="h3 mb-3">Bem-vindo ao Senacmon</h1>
+  <p>Projeto educativo com Django e PostgreSQL. Faça login e inicie sua partida.</p>
+  <div class="d-flex gap-2">
+    <a class="btn btn-success" href="{% url 'game:start' %}">Iniciar Partida</a>
+    <a class="btn btn-outline-secondary" href="{% url 'game:state' %}">Estado da Partida</a>
+  </div>
+</div>
+{% endblock %}
