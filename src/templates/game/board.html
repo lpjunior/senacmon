@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Tabuleiro{% endblock %}
+{% block content %}
+<div class="p-4 bg-white rounded shadow-sm">
+    <h1 class="h5 mb-3">Estado da Partida</h1>
+    <p>Posição, rodada, saldo e eventos aparecerão aqui.</p>
+    <form method="GET" action="{% url 'game:roll' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Rolar Dado</button>
+    </form>
+</div>
+{% endblock %}

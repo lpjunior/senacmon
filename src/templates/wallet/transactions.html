@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Transações{% endblock %}
+{% block content %}
+<div class="p-4 bg-white rounded shadow-sm">
+    <h1 class="h5 mb-3">Transações</h1>
+    {% if transactions %}
+        <ul class="lis-group">
+            {% for transaction in transactions %}
+                <li class="list-group-item">{{ transaction }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Sem transações ainda.</p>
+    {% endif %}
+</div>
+{% endblock %}
