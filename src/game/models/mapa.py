@@ -21,6 +21,8 @@ class MapaPosicao(models.Model):
 
     class Meta:
         db_table = "game_mapa_posicao"
+        verbose_name = "Mapa Posição"
+        verbose_name_plural = "Mapa Posições"
         constraints = [
             models.UniqueConstraint(fields=["mapa", "posicao"], name="uq_mapa_posicao"),
             models.CheckConstraint(check=models.Q(posicao__gte=1), name="ck_posicao_gte_1"),

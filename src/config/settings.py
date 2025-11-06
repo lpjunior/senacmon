@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "accounts",
     "game",
     "wallet",
+    "common",
 ]
 
 MIDDLEWARE = [
