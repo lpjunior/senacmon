@@ -19,6 +19,6 @@ def roll_view(request):
         messages.error(request, "Ação inválida")
         return redirect("game:state")
 
-    # futura lógica: consumir captura, rolar dado, resolver szona
+    # futura lógica: consumir captura, rolar dado, resolver zona
     messages.success(request, "Rolagem efetuada, zona resolvida no placeholder")
     return redirect("game:state")

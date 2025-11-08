@@ -121,6 +121,7 @@ senacmon/
 │  ├─ config/              # projeto Django
 │  ├─ accounts/            # autenticação básica
 │  ├─ game/                # domínio do jogo, services e selectors
+│  │  ├─ services/         # camada de regras de negocio
 │  ├─ wallet/              # carteira e transações de berries
 │  ├─ audit/               # trilha de auditoria
 │  ├─ api/                 # DRF e endpoints REST
@@ -128,73 +129,42 @@ senacmon/
 │  └─ static/              # diretório reservado para assets
 ├─ scripts/                # utilitários de banco e seeds
 ├─ docker/                 # arquivos Docker
-├─ c/           # dependências por ambiente
+├─ c/                      # dependências por ambiente
 ├─ Makefile                # atalhos de automação
 └─ README.md
 
 Log de processo:
 03/11 - Projeto criado, com autenticação básica, navegação mínima e páginas onde iremos encaixar as regras do Senacmon.
+05/11 - Modelagem do domínio finalizada, com base de dados estruturada, seed funcional e painéis administrativos prontos para manipular Pokémons, Mapas, Partidas e Transações.
 
+Por que existe a camada service?
+1. separar regras de negócio das views:
+    views ficam finas, recebem input, chama serviços, retornam o resultado para template.
 
-Entidade: Partida
-Tabela destino: game_partida
+2. Evitar colocar a regra no model:
+    mantém os models enxutos, focados em persistências e constraints
 
-Campos:
+3. Reuso:
+    a mesma regra funciona para views server-side e para futuros endpoints REST, sem duplicar lógica.
 
-• user
-chave estrangeira para o modelo de usuário do sistema, remoção em cascata, nome de relação reversa: partidas
+4. Transações bem definidas:
+    cada função de um serviço abre e fecha transações atomically, o que facilita na consistência.
 
-• mapa
-chave estrangeira para Mapa, proteção contra exclusão, nome de relação reversa: partidas
+Como nosso projeto se conecta ao service:
+    As views chama os services; os services usam os models e registram eventos e transações.
 
-• estado
-texto com até vinte caracteres, usa escolhas definidas em EstadoPartida, valor padrão “EM_ANDAMENTO”, indexado
+    Exemplo:
+        - start_view chama partida_service.start_game.
+        - roll_view chama partida_service.consume_capture_cooldown e partida_service.roll_and_resolve_zone.
 
-• berries_iniciais
-inteiro positivo, valor padrão 100
-
-• rodada_limite
-inteiro positivo pequeno, valor padrão 10
-
-• rodada_atual
-inteiro positivo pequeno, valor padrão 1
-
-• posicao_atual
-inteiro positivo, valor padrão 1
-
-• rounds_restantes_captura
-inteiro positivo pequeno, valor padrão 0
-
-• pokemon_inicial
-chave estrangeira para Pokemon, proteção contra exclusão, nome de relação reversa: partidas_iniciadas
-
-• resumo_final
-campo JSON, pode ser nulo e também pode ficar vazio
-
-• criado_em
-data e hora de criação, gerada automaticamente
-
-• atualizado_em
-data e hora da última atualização, gerada automaticamente
-
-Índices adicionais:
-• índice composto em user e estado, nome: ix_partida_user_estado
-• índice simples em atualizado_em, nome: ix_partida_updated
-
-Restrições de verificação:
-• rodada_atual deve ser maior ou igual a 1, nome: ck_partida_rodada_gte_1
-• posicao_atual deve ser maior ou igual a 1, nome: ck_partida_posicao_gte_1
-
-Representação humana:
-• ao converter em texto, exibe “Partida” seguida do identificador e do nome do usuário associado
+Um exemplo de pseudo-fluxo:
+    View -> Service de domínio -> Models e Wallet Service -> Events -> Template
 
 
 
+DTO -> Data Transfer Object (Objeto de transferência de dados)
 
-
-
-
-
+PRNG -> pseudo random number generator
 
 
 
