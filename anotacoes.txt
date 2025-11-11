@@ -161,10 +161,9 @@ Um exemplo de pseudo-fluxo:
     View -> Service de domínio -> Models e Wallet Service -> Events -> Template
 
 
-
 DTO -> Data Transfer Object (Objeto de transferência de dados)
 
 PRNG -> pseudo random number generator
 
-
+select * from view_jogador
 

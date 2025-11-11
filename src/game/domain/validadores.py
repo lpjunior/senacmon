@@ -1,6 +1,5 @@
 from game.domain.excecoes import ErroBloqueioCaptura, ErroBatalhaAtiva, ErroApostaInvalida
 
-
 def garantir_nao_capturado(rodadas_restantes_captura: int):
     if rodadas_restantes_captura > 0:
         raise ErroBloqueioCaptura("Você está capturado por N rodadas.")
