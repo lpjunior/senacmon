@@ -1,4 +1,4 @@
 -r requirements-base.txt
 Gunicorn==23.0.0
 whitenoise==6.7.0
-dj-database-url==2.2.0
+dj-database-url==3.0.1
