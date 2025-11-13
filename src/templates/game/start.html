@@ -1,12 +1,26 @@
 {% extends "base.html" %}
-{% block title %}Início da Partida{% endblock %}
+{% block title %}Escolher Pokémon{% endblock %}
 {% block content %}
 <div class="p-4 bg-white rounded shadow-sm">
-    <h1 class="h5 mb-3">Começar Senacmon</h1>
-    <p>Escolha seu Pokémon inicial e inicie sua jornada.</p>
-    <form method="POST" action="{% url 'game:start' %}">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-success">Criar Partida</button>
-    </form>
+  <h1 class="h5 mb-3">Escolha seu Pokémon inicial</h1>
+  <form method="post">{% csrf_token %}
+    <div class="row">
+      {% for p in pokemons %}
+        <div class="col-md-4 mb-3">
+          <div class="card h-100 text-center">
+            {% if p.sprite_url %}
+              <img src="{{ p.sprite_url }}" class="card-img-top" alt="{{ p.nome }}">
+            {% endif %}
+            <div class="card-body">
+              <h5>{{ p.nome }}</h5>
+              <p class="text-muted">{{ p.get_elemento_display }}</p>
+              <input type="radio" name="starter_id" value="{{ p.id }}" required>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <button class="btn btn-success w-100">Começar Partida</button>
+  </form>
 </div>
 {% endblock %}

@@ -2,15 +2,16 @@
 {% block title %}Transações{% endblock %}
 {% block content %}
 <div class="p-4 bg-white rounded shadow-sm">
-    <h1 class="h5 mb-3">Transações</h1>
-    {% if transactions %}
-        <ul class="lis-group">
-            {% for transaction in transactions %}
-                <li class="list-group-item">{{ transaction }}</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>Sem transações ainda.</p>
-    {% endif %}
+  <h1 class="h5 mb-3">Últimas Transações</h1>
+  <ul class="list-group">
+    {% for t in transacoes %}
+      <li class="list-group-item d-flex justify-content-between">
+        <span>{{ t.tipo }}</span>
+        <span>{% if t.valor > 0 %}+{% endif %}{{ t.valor }}</span>
+      </li>
+    {% empty %}
+      <li class="list-group-item text-muted">Sem transações ainda.</li>
+    {% endfor %}
+  </ul>
 </div>
 {% endblock %}

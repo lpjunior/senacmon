@@ -28,7 +28,7 @@ def aplicar_zona(partida: Partida, rodada: int, zona: str, valor_param: int | No
             partida=partida,
             rodada=rodada,
             pokemon_jogador=partida.pokemon_inicial,
-            pokemon_oponente=oponente,
+            pokemon_adversario=oponente,
         )
 
         payload["oponente_id"] = oponente.id if oponente else None

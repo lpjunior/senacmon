@@ -1,12 +1,37 @@
 {% extends "base.html" %}
-{% block title %}Tabuleiro{% endblock %}
+{% block title %}Partida{% endblock %}
 {% block content %}
 <div class="p-4 bg-white rounded shadow-sm">
-    <h1 class="h5 mb-3">Estado da Partida</h1>
-    <p>Posição, rodada, saldo e eventos aparecerão aqui.</p>
-    <form method="GET" action="{% url 'game:roll' %}">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary">Rolar Dado</button>
+  <h1 class="h5 mb-3">Partida em andamento</h1>
+  <p>Rodada: {{ partida.rodada_atual }} / {{ partida.rodada_limite }}</p>
+  <p>Posição: {{ partida.posicao_atual }}</p>
+  <p>Saldo atual: <strong>{{ saldo }}</strong> berries</p>
+
+  {% if batalha_pendente %}
+    <a class="btn btn-warning w-100" href="{% url 'game:battle' %}">Ir para batalha</a>
+  {% elif partida.rounds_restantes_captura > 0 %}
+    <p class="text-danger">Equipe Rocket te capturou! Rodadas restantes: {{ partida.rounds_restantes_captura }}</p>
+    <form method="post" action="{% url 'game:roll' %}">{% csrf_token %}
+      <button class="btn btn-secondary w-100">Avançar rodada</button>
     </form>
+  {% else %}
+    <form method="post" action="{% url 'game:roll' %}">{% csrf_token %}
+      <button class="btn btn-primary w-100">Rolar Dado</button>
+    </form>
+  {% endif %}
+</div>
+
+<hr>
+<div class="mt-3">
+  <h5>Eventos recentes</h5>
+  <ul class="list-group">
+    {% for e in eventos %}
+      <li class="list-group-item">
+        <small><strong>{{ e.tipo_evento }}</strong> — {{ e.mensagem_usuario }}</small>
+      </li>
+    {% empty %}
+      <li class="list-group-item text-muted">Sem eventos ainda.</li>
+    {% endfor %}
+  </ul>
 </div>
 {% endblock %}
