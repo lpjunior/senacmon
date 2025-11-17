@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.contrib import messages
-from game.models import Partida
+from game.models import Partida, Batalha
 from game.services.partida_service import consume_capture_cooldown, rolar_dados_e_resolver_zona
 from game.domain.excecoes import ErroBloqueioCaptura
+from game.choices import EstadoPartida
 
 @login_required
 def roll_view(request):
@@ -11,10 +12,21 @@ def roll_view(request):
         messages.error(request, "Ação inválida.")
         return redirect("game:state")
 
-    partida = Partida.objects.filter(user=request.user, estado="em_andamento").first()
+    partida = Partida.objects.filter(user=request.user, estado=EstadoPartida.EM_ANDAMENTO).first()
     if not partida:
         messages.info(request, "Nenhuma partida ativa.")
         return redirect("game:start")
+    
+    # Verificar se há batalha pendente
+    batalha_pendente = Batalha.objects.filter(
+        partida=partida, 
+        rodada=partida.rodada_atual, 
+        numero_sorteado__isnull=True
+    ).first()
+    
+    if batalha_pendente:
+        messages.warning(request, "Você precisa resolver a batalha pendente primeiro!")
+        return redirect("game:battle")
 
     # Caso capturado, apenas consome rodada
     if consume_capture_cooldown(partida):

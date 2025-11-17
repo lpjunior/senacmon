@@ -1,41 +1,156 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="pt-br" xmlns="http://www.w3.org/1999/html">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Senacmon{% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-</head>
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg bg-body-ternary mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">Senacmon</a>
-            <div>
-                {% if user.is_authenticated %}
-                    <a class="btn btn-outline-primary btn-sm" href="{% url 'accounts:profile' %}">Perfil</a>
-                    <a class="btn btn-outline-danger btn-sm" href="{% url 'accounts:logout' %}">Sair</a>
-                {% else %}
-                    <a class="btn btn-primary btn-sm" href="{% url 'accounts:login' %}">Entrar</a>
-                    <a class="btn btn-outline-danger btn-sm" href="{% url 'accounts:register' %}">Registrar</a>
-                {% endif %}
-            </div>
-        </div>
-    </nav>
 
-    <main class="container">
-        {% for message in messages %}
-            <div class="alert
-                {% if message.tags == 'error' %}
-                    alert-danger
-                {% elif message.tags == 'debug' %}
-                    alert-secondary
-                {% else %}
-                    alert-{{ message.tags }}
-                {% endif %}
-        ">{{ message }}</div>
-        {% endfor %}
-        {% block content %}{% endblock %}
-    </main>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+      :root {
+        --navbar-bg: #0b4aa6;
+        --card-bg: #ffffff;
+        --text-color: #111827;
+        --page-bg: #f8fafc;
+      }
+
+      [data-theme="dark"] {
+        --navbar-bg: #0a1528;
+        --card-bg: #121826;
+        --text-color: #f1f5f9;
+        --page-bg: #0d1520;
+      }
+
+      body {
+        background: var(--page-bg) !important;
+        color: var(--text-color) !important;
+      }
+
+      .navbar {
+        background: var(--navbar-bg) !important;
+      }
+
+      [data-theme="dark"] .text-muted {
+        color: #cbd5e1 !important;
+      }
+
+      [data-theme="dark"] .card {
+        background: var(--card-bg) !important;
+        color: var(--text-color) !important;
+      }
+
+      .js-user-avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #ffffff33;
+        color: #fff;
+        font-weight: 700;
+      }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+
+    <a class="navbar-brand d-flex align-items-center" href="{% url 'common:home' %}">
+      <img src="{% static 'senacmon-logo.png' %}" alt="logo" height="42">
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarNav" aria-controls="navbarNav"
+            aria-expanded="false" aria-label="Menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav align-items-center gap-3">
+
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'common:about' %}">Sobre o jogo</a>
+        </li>
+
+        <li class="nav-item">
+          <button id="toggle-theme" class="btn btn-sm btn-outline-light" style="border-radius: 50%;">
+            🌙
+          </button>
+        </li>
+
+        {% if user.is_authenticated %}
+
+          <li class="nav-item">
+            <span class="navbar-text js-user-avatar">
+              {{ user.username|slice:":1"|upper }}
+            </span>
+          </li>
+
+          <li class="nav-item">
+            <a class="btn btn-danger btn-sm px-3" href="{% url 'accounts:logout' %}">
+              Sair
+            </a>
+          </li>
+
+        {% else %}
+
+          <li class="nav-item">
+            <a class="btn btn-light btn-sm px-3" href="{% url 'accounts:login' %}">
+              Entrar
+            </a>
+          </li>
+
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+  {% block content %}{% endblock %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  const body = document.body;
+  const toggleBtn = document.getElementById("toggle-theme");
+
+  function aplicarTema() {
+    const tema = localStorage.getItem("temaSenacmon") || "light";
+
+    if (tema === "dark") {
+      body.setAttribute("data-theme", "dark");
+      toggleBtn.textContent = "☀️";
+    } else {
+      body.removeAttribute("data-theme");
+      toggleBtn.textContent = "🌙";
+    }
+  }
+
+  aplicarTema();
+
+  toggleBtn?.addEventListener("click", () => {
+    const temaAtual = localStorage.getItem("temaSenacmon");
+    const novoTema = temaAtual === "dark" ? "light" : "dark";
+    localStorage.setItem("temaSenacmon", novoTema);
+    aplicarTema();
+  });
+
+  const savedAvatar = localStorage.getItem("senacmonAvatarImage");
+  if (savedAvatar) {
+    document.querySelectorAll(".js-user-avatar").forEach(el => {
+      el.style.backgroundImage = `url(${savedAvatar})`;
+      el.style.backgroundSize = "cover";
+      el.style.backgroundPosition = "center";
+      el.textContent = "";
+    });
+  }
+</script>
+
 </body>
 </html>

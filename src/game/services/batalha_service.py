@@ -56,11 +56,19 @@ def resolver_batalha(batalha: Batalha, numeros: list[int], valor_aposta: int | N
     batalha.detalhe_elemental = {"resultado": resultado}
     batalha.save()
 
+    # Criar mensagem descritiva
+    if not batalha.houve_aposta:
+        mensagem = f"🔍 Batalha simulada: número {sorteado} saiu. Escolheu {numeros}"
+    elif batalha.resultado == ResultadoBatalha.VITORIA:
+        mensagem = f"🏆 VITÓRIA! Número {sorteado} acertou! +{batalha.berries_delta} berries (x{mult_efetiva:.2f})"
+    else:
+        mensagem = f"💔 Derrota... Número {sorteado} saiu. Perdeu {abs(batalha.berries_delta)} berries"
+
     EventoRodada.objects.create(
         partida=batalha.partida,
         rodada=batalha.rodada,
         tipo_evento="batalha",
-        mensagem_usuario="Batalha resolvida",
+        mensagem_usuario=mensagem,
         payload={
             "numeros": numeros,
             "sorteado": sorteado,
@@ -69,7 +77,6 @@ def resolver_batalha(batalha: Batalha, numeros: list[int], valor_aposta: int | N
             "valor_aposta": batalha.valor_aposta,
             "resultado_batalha": batalha.resultado,
             "berries_delta": batalha.berries_delta,
-
         },
         criado_em=timezone.now()
     )

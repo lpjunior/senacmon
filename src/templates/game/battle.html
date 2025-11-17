@@ -3,24 +3,30 @@
 {% block content %}
 <div class="p-4 bg-white rounded shadow-sm">
   <h1 class="h5 mb-3">Batalha!</h1>
-  <p>Oponente: <strong>{{ preview.opponent_name }}</strong> ({{ preview.opponent_elem }})</p>
-  <p>Seu Pokémon: <strong>{{ preview.player_elem }}</strong></p>
-  <p>Saldo atual: {{ saldo }}</p>
 
-  <form method="post" action="{% url 'game:battle_resolve' %}">{% csrf_token %}
+  <p>Oponente: <strong>{{ preview.oponente_nome }}</strong> ({{ preview.oponente_elemento }})</p>
+  <p>Seu Pokémon: <strong>{{ preview.jogador_elemento }}</strong></p>
+  <p>Saldo atual: {{ saldo }} berries</p>
+  <p>Aposta mínima:
+    1 número = {{ preview.min_simples }} |
+    2 números = {{ preview.min_dupla }}
+  </p>
+
+  <form method="post" action="{% url 'game:battle_resolve' %}">
+    {% csrf_token %}
     <div class="mb-3">
-      <label class="form-label">Escolha 1 ou 2 números</label>
+      <label class="form-label">Escolha 1 ou 2 números (0 a 9)</label>
       <input type="number" name="numeros" min="0" max="9" class="form-control mb-2" required>
       <input type="number" name="numeros" min="0" max="9" class="form-control mb-2">
     </div>
 
     <div class="mb-3">
-      <label class="form-label">Valor da aposta (ou 0 para simular)</label>
+      <label class="form-label">Valor da aposta (0 para só simular)</label>
       <input type="number" name="valor_aposta" min="0" class="form-control">
     </div>
 
     <div class="d-flex gap-2">
-      <button class="btn btn-success flex-fill" name="modo" value="apostar">Apostar e Lutar</button>
+      <button class="btn btn-success flex-fill" name="modo" value="apostar">Apostar e lutar</button>
       <button class="btn btn-secondary flex-fill" name="modo" value="simular">Simular sem aposta</button>
     </div>
   </form>

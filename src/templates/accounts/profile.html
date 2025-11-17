@@ -1,9 +1,274 @@
 {% extends "base.html" %}
-{% block title %}Perfil{% endblock %}
+{% block title %}Perfil do Treinador{% endblock %}
 {% block content %}
-<div class="p-4 bg-white rounded shadow-sm">
-    <h1 class="h3 mb-3">Perfil de {{ user.username }}</h1>
-    <p><strong>Nome de usuário:</strong> {{ user.username }}</p>
-    <p><strong>Email:</strong> {{ user.email }}</p>
+
+<style>
+  .trainer-wrapper {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .trainer-card {
+    border-radius: 24px;
+    padding: 28px 26px 26px;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
+    border: none;
+    background: var(--card-bg);
+    color: var(--text-color);
+  }
+
+  .trainer-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+
+  .trainer-avatar-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .trainer-avatar-label {
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .trainer-avatar-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 30% 25%, #ffffff, #ffd34d 55%, #ffb930 100%);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25);
+  }
+
+  .trainer-avatar-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .trainer-avatar-circle span {
+    font-size: 32px;
+    font-weight: 800;
+    color: #2b1905;
+  }
+
+  .change-avatar-text {
+    font-size: 0.8rem;
+    color: #6b7280;
+    text-decoration: underline;
+  }
+
+  .trainer-name {
+    margin: 0;
+    font-weight: 800;
+  }
+
+  .trainer-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: var(--primary-color);
+    color: #fff;
+  }
+
+  .trainer-meta {
+    font-size: 0.9rem;
+    color: #6b7280;
+  }
+
+  .trainer-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 18px 0 6px;
+  }
+
+  .trainer-pill {
+    flex: 1 1 120px;
+    min-width: 120px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: #f3f6ff;
+    border: 1px solid #d7dffc;
+    font-size: 0.9rem;
+  }
+
+  [data-theme="dark"] .trainer-pill {
+    background: #161b2a;
+    border-color: #283554;
+  }
+
+  .trainer-pill span {
+    display: block;
+  }
+
+  .trainer-pill .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #6b7280;
+  }
+
+  .trainer-pill .value {
+    font-weight: 800;
+    color: #111827;
+  }
+
+  [data-theme="dark"] .trainer-pill .value {
+    color: #f9fafb;
+  }
+
+  .trainer-description {
+    font-size: 0.95rem;
+    color: #4b5563;
+  }
+
+  [data-theme="dark"] .trainer-description {
+    color: #e5e7eb;
+  }
+
+  .trainer-actions {
+    margin-top: 18px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .btn-edit-trainer {
+    border-radius: 999px;
+    padding: 8px 20px;
+    font-weight: 600;
+  }
+</style>
+
+<div class="trainer-wrapper">
+  <div class="card trainer-card">
+
+    <div class="trainer-header">
+
+      <div class="trainer-avatar-wrapper">
+        <label for="avatar-input" class="trainer-avatar-label">
+          <div class="trainer-avatar-circle">
+            <img id="trainer-avatar-img" src="" class="d-none" alt="Avatar">
+            <span id="trainer-avatar-fallback">
+              {{ user.username|slice:":1"|upper }}
+            </span>
+          </div>
+          <span class="change-avatar-text">Alterar avatar</span>
+        </label>
+        <input type="file" id="avatar-input" accept="image/*" class="d-none">
+      </div>
+
+      <div>
+        <h1 class="h4 trainer-name mb-1">
+          {{ user.username }}
+        </h1>
+        <div class="trainer-meta">
+          {% if user.email %}
+            {{ user.email }}
+          {% else %}
+            E-mail não informado
+          {% endif %}
+        </div>
+        <span class="trainer-badge mt-2 d-inline-block">
+          Treinador Senacmon
+        </span>
+      </div>
+    </div>
+
+    <div class="trainer-stats">
+      <div class="trainer-pill">
+        <span class="label">Saldo de berries</span>
+        <span class="value">120</span>
+      </div>
+      <div class="trainer-pill">
+        <span class="label">Nível</span>
+        <span class="value">1</span>
+      </div>
+      <div class="trainer-pill">
+        <span class="label">Partidas</span>
+        <span class="value">—</span>
+      </div>
+    </div>
+
+    <p class="trainer-description mt-3 mb-1">
+      Esse é o seu perfil de treinador no mundo Senacmon. Use suas berries com sabedoria,
+      escolha bem seus Pokémons iniciais e acompanhe aqui sua jornada pela arena.
+    </p>
+
+    <div class="trainer-actions">
+      <button type="button" class="btn btn-outline-primary btn-edit-trainer">
+        Editar Perfil
+      </button>
+    </div>
+
+  </div>
 </div>
+
+<script>
+  function aplicarAvatarNavbar(dataUrl) {
+    document.querySelectorAll(".js-user-avatar").forEach(function(el) {
+      if (!dataUrl) {
+        el.style.backgroundImage = "";
+        el.style.width = "";
+        el.style.height = "";
+        el.style.borderRadius = "";
+        el.style.display = "";
+        return;
+      }
+      el.textContent = "";
+      el.style.backgroundImage = "url(" + dataUrl + ")";
+      el.style.backgroundSize = "cover";
+      el.style.backgroundPosition = "center";
+      el.style.display = "inline-block";
+      el.style.width = "28px";
+      el.style.height = "28px";
+      el.style.borderRadius = "50%";
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    var img = document.getElementById("trainer-avatar-img");
+    var fallback = document.getElementById("trainer-avatar-fallback");
+    var input = document.getElementById("avatar-input");
+
+    var storedImg = localStorage.getItem("senacmonAvatarImage");
+    if (storedImg) {
+      img.src = storedImg;
+      img.classList.remove("d-none");
+      fallback.classList.add("d-none");
+      aplicarAvatarNavbar(storedImg);
+    }
+
+    if (!input) return;
+
+    input.addEventListener("change", function(ev) {
+      var file = ev.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith("image/")) return;
+
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var dataUrl = e.target.result;
+        localStorage.setItem("senacmonAvatarImage", dataUrl);
+        img.src = dataUrl;
+        img.classList.remove("d-none");
+        fallback.classList.add("d-none");
+        aplicarAvatarNavbar(dataUrl);
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+</script>
+
 {% endblock %}

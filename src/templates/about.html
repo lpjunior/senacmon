@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Sobre o Senacmon{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-body">
+    <h1 class="h4 mb-3">Sobre o Senacmon</h1>
+
+    <p class="mb-3">
+      O Senacmon é um jogo de tabuleiro digital pensado como projeto de programação.
+      A ideia é treinar lógica, tomada de decisão e registro de dados enquanto o
+      jogador se diverte em uma partida solo.
+    </p>
+
+    <h2 class="h5 mt-3 mb-2">Como o jogo funciona</h2>
+    <ul class="mb-3">
+      <li>Modo solo: um jogador por sessão.</li>
+      <li>Escolha de um Senacmon inicial com elemento água, fogo ou planta.</li>
+      <li>Avanço em um mapa de casas numeradas, definido por rolagem de dado (1 a 6).</li>
+      <li>Cada casa do mapa tem um tipo de zona: neutra, bônus, perda, batalha ou captura.</li>
+      <li>Nas batalhas, o sistema usa vantagem elemental (água &gt; fogo, fogo &gt; planta, planta &gt; água).</li>
+      <li>O jogador pode apostar berries (moeda do jogo) ou apenas batalhar sem aposta.</li>
+      <li>Existe chance de captura pela Equipe Rocket, que bloqueia o jogador por 2 rodadas.</li>
+      <li>A partida termina por limite de rodadas ou quando o saldo de berries chega a zero.</li>
+    </ul>
+
+    <h2 class="h5 mt-3 mb-2">Conceitos principais</h2>
+    <ul class="mb-3">
+      <li><strong>Berries:</strong> moeda usada para apostas, o jogador inicia com 100.</li>
+      <li><strong>Zona:</strong> define o que acontece na casa (ganhar, perder, batalhar, ser capturado ou nada).</li>
+      <li><strong>Histórico:</strong> registro dos eventos de cada rodada, como movimentos, bônus, perdas e batalhas.</li>
+    </ul>
+
+    <h2 class="h5 mt-3 mb-2">Por trás das telas</h2>
+    <p class="mb-2">
+      Este sistema foi desenvolvido em <strong>Python/Django</strong>, com HTML e CSS no
+      frontend. O domínio do jogo foi organizado em entidades como Jogador, Partida,
+      Mapa, Batalha e Transações de Berries, permitindo registrar de forma estruturada
+      o que acontece em cada rodada.
+    </p>
+
+    <p class="mb-0 text-muted">
+      O objetivo do projeto é unir prática de programação, modelagem de domínio
+      e diversão em um mesmo ambiente.
+    </p>
+  </div>
+</div>
+{% endblock %}

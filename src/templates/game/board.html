@@ -1,37 +1,107 @@
 {% extends "base.html" %}
 {% block title %}Partida{% endblock %}
 {% block content %}
-<div class="p-4 bg-white rounded shadow-sm">
-  <h1 class="h5 mb-3">Partida em andamento</h1>
-  <p>Rodada: {{ partida.rodada_atual }} / {{ partida.rodada_limite }}</p>
-  <p>Posição: {{ partida.posicao_atual }}</p>
-  <p>Saldo atual: <strong>{{ saldo }}</strong> berries</p>
 
-  {% if batalha_pendente %}
-    <a class="btn btn-warning w-100" href="{% url 'game:battle' %}">Ir para batalha</a>
-  {% elif partida.rounds_restantes_captura > 0 %}
-    <p class="text-danger">Equipe Rocket te capturou! Rodadas restantes: {{ partida.rounds_restantes_captura }}</p>
-    <form method="post" action="{% url 'game:roll' %}">{% csrf_token %}
-      <button class="btn btn-secondary w-100">Avançar rodada</button>
+{% if partida.estado == "encerrada" %}
+  <div class="p-4 bg-light rounded shadow-sm">
+    <h1 class="h4 mb-4 text-center">🏁 Partida Encerrada</h1>
+    
+    {% if partida.resumo_final %}
+      <div class="card mb-3">
+        <div class="card-header bg-primary text-white">
+          <strong>📊 Resumo Final</strong>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <p><strong>Pokémon:</strong> {{ partida.resumo_final.pokemon_usado }}</p>
+              <p><strong>Rodadas jogadas:</strong> {{ partida.resumo_final.rodadas_jogadas }}</p>
+              <p><strong>Posição final:</strong> {{ partida.resumo_final.posicao_final }}</p>
+              <p><strong>Motivo:</strong> {{ partida.resumo_final.motivo_encerramento }}</p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Saldo inicial:</strong> {{ partida.resumo_final.saldo_inicial }} berries</p>
+              <p><strong>Saldo final:</strong> {{ partida.resumo_final.saldo_final }} berries</p>
+              <p><strong>Lucro/Prejuízo:</strong> 
+                <span class="{% if partida.resumo_final.lucro_liquido >= 0 %}text-success{% else %}text-danger{% endif %}">
+                  {{ partida.resumo_final.lucro_liquido }} berries
+                </span>
+              </p>
+            </div>
+          </div>
+          
+          <hr>
+          
+          <div class="row text-center">
+            <div class="col-4">
+              <h5 class="text-success">{{ partida.resumo_final.vitorias }}</h5>
+              <small>Vitórias</small>
+            </div>
+            <div class="col-4">
+              <h5 class="text-danger">{{ partida.resumo_final.derrotas }}</h5>
+              <small>Derrotas</small>
+            </div>
+            <div class="col-4">
+              <h5 class="text-muted">{{ partida.resumo_final.batalhas_sem_aposta }}</h5>
+              <small>Sem Aposta</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    
+    <div class="text-center">
+      <a href="{% url 'game:start' %}" class="btn btn-success btn-lg">🎮 Nova Partida</a>
+      <a href="{% url 'common:home' %}" class="btn btn-secondary btn-lg">🏠 Início</a>
+    </div>
+  </div>
+
+{% else %}
+  <div class="p-4 bg-white rounded shadow-sm">
+    <h1 class="h5 mb-3">Partida em andamento</h1>
+    <p>Rodada: {{ partida.rodada_atual }} / {{ partida.rodada_limite }}</p>
+    <p>Posição: {{ partida.posicao_atual }}</p>
+    <p>Saldo atual: <strong>{{ saldo }}</strong> berries</p>
+
+    {% if batalha_pendente %}
+      <a class="btn btn-warning w-100 mb-2" href="{% url 'game:battle' %}">⚔️ Ir para batalha</a>
+    {% elif partida.rounds_restantes_captura > 0 %}
+      <p class="text-danger">Equipe Rocket te capturou! Rodadas restantes: {{ partida.rounds_restantes_captura }}</p>
+      <form method="post" action="{% url 'game:roll' %}">{% csrf_token %}
+        <button class="btn btn-secondary w-100 mb-2">Avançar rodada</button>
+      </form>
+    {% else %}
+      <form method="post" action="{% url 'game:roll' %}">{% csrf_token %}
+        <button class="btn btn-primary w-100 mb-2">🎲 Rolar Dado</button>
+      </form>
+    {% endif %}
+    
+    <form method="post" action="{% url 'game:abandon' %}" onsubmit="return confirm('Tem certeza que deseja abandonar esta partida?');">
+      {% csrf_token %}
+      <button class="btn btn-danger w-100 btn-sm">🏳️ Abandonar Partida</button>
     </form>
-  {% else %}
-    <form method="post" action="{% url 'game:roll' %}">{% csrf_token %}
-      <button class="btn btn-primary w-100">Rolar Dado</button>
-    </form>
-  {% endif %}
-</div>
+  </div>
+{% endif %}
 
 <hr>
 <div class="mt-3">
-  <h5>Eventos recentes</h5>
-  <ul class="list-group">
+  <h5>📜 Histórico de Eventos</h5>
+  <div class="list-group">
     {% for e in eventos %}
-      <li class="list-group-item">
-        <small><strong>{{ e.tipo_evento }}</strong> — {{ e.mensagem_usuario }}</small>
-      </li>
+      <div class="list-group-item {% if e.tipo_evento == 'batalha' %}bg-light{% elif e.tipo_evento == 'zona' %}{% if 'Bônus' in e.mensagem_usuario %}bg-success bg-opacity-10{% elif 'Perda' in e.mensagem_usuario %}bg-danger bg-opacity-10{% elif 'Capturado' in e.mensagem_usuario %}bg-warning bg-opacity-10{% endif %}{% endif %}">
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="flex-grow-1">
+            <small class="text-muted">Rodada {{ e.rodada }}</small>
+            <p class="mb-0">{{ e.mensagem_usuario }}</p>
+          </div>
+          <small class="badge bg-secondary ms-2">{{ e.tipo_evento }}</small>
+        </div>
+      </div>
     {% empty %}
-      <li class="list-group-item text-muted">Sem eventos ainda.</li>
+      <div class="list-group-item text-muted text-center">
+        <small>Nenhum evento ainda. Role o dado para começar!</small>
+      </div>
     {% endfor %}
-  </ul>
+  </div>
 </div>
 {% endblock %}

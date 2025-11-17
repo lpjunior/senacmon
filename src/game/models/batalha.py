@@ -35,7 +35,7 @@ class Batalha(models.Model):
         ]
         constraints = [
             models.CheckConstraint(check=models.Q(valor_aposta__gte=0), name="ck_batalha_aposta_gte_0"),
-            models.CheckConstraint(check=models.Q(multiplicador_efetivo__gte=1.00), name="ck_batalha_multi_min"),
+            models.CheckConstraint(check=models.Q(multiplicador_efetivo__gte=0.20), name="ck_batalha_multi_min"),
         ]
 
     def __str__(self):

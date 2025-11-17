@@ -1,12 +1,188 @@
 {% extends "base.html" %}
-{% block title %}Senacmon, Home{% endblock %}
+{% load static %}
+{% block title %}Senacmon – Home{% endblock %}
 {% block content %}
-<div class="p-4 bg-white rounded shadow-sm">
-  <h1 class="h3 mb-3">Bem-vindo ao Senacmon</h1>
-  <p>Projeto educativo com Django e PostgreSQL. Faça login e inicie sua partida.</p>
-  <div class="d-flex gap-2">
-    <a class="btn btn-success" href="{% url 'game:start' %}">Iniciar Partida</a>
-    <a class="btn btn-outline-secondary" href="{% url 'game:state' %}">Estado da Partida</a>
+
+<style>
+  .home-bg {
+    min-height: calc(100vh - 120px);
+    background:
+      linear-gradient(
+        rgba(255,255,255,0.65),
+        rgba(255,255,255,0.75),
+        rgba(255,255,255,0.90)
+      ),
+      url("{% static 'bg-senacmon.png' %}");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-attachment: fixed;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 0 80px;
+  }
+
+  body[data-theme="dark"] .home-bg {
+    background:
+      linear-gradient(
+        rgba(3,7,18,0.92),
+        rgba(3,7,18,0.94),
+        rgba(3,7,18,0.96)
+      ),
+      url("{% static 'bg-senacmon.png' %}");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+
+  .hero-card {
+    max-width: 720px;
+    width: 100%;
+    border-radius: 24px;
+    padding: 32px 32px 36px;
+    background: #ffffff;
+    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.16);
+  }
+
+  body[data-theme="dark"] .hero-card {
+    background: #020617;
+    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.6);
+    color: #e5e7eb;
+  }
+
+  .home-logo {
+    max-width: 220px;
+    height: auto;
+  }
+
+  .badge-mode {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: #0b4aa6;
+    color: #fff;
+  }
+
+  body[data-theme="dark"] .badge-mode {
+    background: #2563eb;
+  }
+
+  .btn-go {
+    padding: 12px 28px;
+    border-radius: 999px;
+    font-weight: 700;
+    border: 1px solid #d2d8e5;
+    background: #ffffff;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.10);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: 0.15s ease-in-out;
+    width: 200px;
+    text-align: center;
+  }
+
+  .btn-go-primary {
+    color: #f29b1f;
+    border-color: #ffcf6b;
+  }
+
+  .btn-go-secondary {
+    color: #3551a4;
+  }
+
+  body[data-theme="dark"] .btn-go {
+    background: #020617;
+    border-color: #1f2937;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+    color: #e5e7eb;
+  }
+
+  body[data-theme="dark"] .btn-go-primary {
+    color: #fbbf24;
+    border-color: #fbbf24;
+  }
+
+  body[data-theme="dark"] .btn-go-secondary {
+    color: #93c5fd;
+  }
+
+  .btn-go:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16);
+  }
+
+  .btn-go:active {
+    transform: translateY(2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  }
+
+  body[data-theme="dark"] .text-muted {
+    color: #cbd5e1 !important;
+  }
+</style>
+
+<div class="home-bg">
+  <div class="hero-card text-center">
+
+    <div class="mb-3">
+      <img
+        src="{% static 'senacmon-logo.png' %}"
+        alt="Logo Senacmon"
+        class="home-logo"
+      >
+    </div>
+
+    {% if user.is_authenticated %}
+      <span class="badge-mode mb-2">Treinador conectado</span>
+
+      <h1 class="h3 mb-2">
+        Bem-vindo, {{ user.username }}! Seu mundo Senacmon espera por você!
+      </h1>
+
+      <p class="text-muted mb-4">
+        Escolha seu Pokémon inicial, role os dados e enfrente batalhas para provar que você é o melhor treinador da arena.
+      </p>
+
+      <div class="d-flex flex-column justify-content-center align-items-center gap-3">
+        <a class="btn-go btn-go-primary" href="{% url 'game:start' %}">
+          Iniciar
+        </a>
+
+        <a class="btn-go btn-go-secondary" href="{% url 'game:state' %}">
+          Status
+        </a>
+
+        <a class="btn-go btn-go-secondary" href="{% url 'accounts:profile' %}">
+          Perfil
+        </a>
+      </div>
+
+    {% else %}
+
+      <h1 class="h3 mb-2">Bem-vindo ao Senacmon</h1>
+      <p class="text-muted mb-4">
+        Faça login ou crie sua conta para começar sua jornada como treinador Senacmon.
+      </p>
+
+      <div class="d-flex flex-column justify-content-center align-items-center gap-3">
+        <a class="btn-go btn-go-primary" href="{% url 'accounts:login' %}">
+          Entrar para jogar
+        </a>
+
+        <a class="btn-go btn-go-secondary" href="{% url 'accounts:register' %}">
+          Criar conta
+        </a>
+      </div>
+
+    {% endif %}
   </div>
 </div>
+
 {% endblock %}

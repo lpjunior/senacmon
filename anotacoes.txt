@@ -167,3 +167,8 @@ PRNG -> pseudo random number generator
 
 select * from view_jogador
 
+Build Command:
+pip install -r requirements/requirements.txt && python src/manage.py collectstatic --noinput
+
+Start Command:
+gunicorn config.wsgi:application --chdir src --bind 0.0.0.0:$PORT
