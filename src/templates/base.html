@@ -86,11 +86,11 @@
 
           <li class="nav-item">
             <a href="{% url 'accounts:profile' %}" class="navbar-text js-user-avatar" style="text-decoration: none;">
-                {% if user.profile.avatar_url %}
-                    <img src="{{ user.profile.avatar_url }}" alt="Avatar" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover">
-                {% else %}
-                    {{ user.username|slice:':1'|upper }}
-                {% endif %}
+              {% if user.profile.avatar_url %}
+                <img src="{{ user.profile.avatar_url }}" alt="Avatar" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">
+              {% else %}
+                {{ user.username|slice:":1"|upper }}
+              {% endif %}
             </a>
           </li>
 
@@ -145,15 +145,6 @@
     aplicarTema();
   });
 
-  const savedAvatar = localStorage.getItem("senacmonAvatarImage");
-  if (savedAvatar) {
-    document.querySelectorAll(".js-user-avatar").forEach(el => {
-      el.style.backgroundImage = `url(${savedAvatar})`;
-      el.style.backgroundSize = "cover";
-      el.style.backgroundPosition = "center";
-      el.textContent = "";
-    });
-  }
 </script>
 
 </body>
