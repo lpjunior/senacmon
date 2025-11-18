@@ -7,6 +7,7 @@ class Profile(models.Model):
     berries_cache = models.PositiveIntegerField(default=0)
     # será preenchido após escolher o starter, FK adiada para evitar import circular
     starter_pokemon_id = models.IntegerField(null=True, blank=True)
+    avatar_url = models.URLField(null=True, blank=True)
 
     class Meta:
         db_table = 'accounts_profile'

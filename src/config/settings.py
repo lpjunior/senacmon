@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 
+import cloudinary.uploader
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -11,6 +13,11 @@ if os.getenv("DJANGO_ENV") != "production":
         load_dotenv(BASE_DIR.parent / ".env")
     except ImportError:
         pass
+
+# Cloudinary Configuration
+cloudinary.config(
+    cloudinary_url=(os.getenv('CLOUDINARY_URL', 'cloudinary://dd5ctcpot'))
+)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/

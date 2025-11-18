@@ -1,7 +1,11 @@
 from django.contrib import messages
+import cloudinary.uploader
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import redirect, render
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.shortcuts import redirect, render
+from accounts.models import Profile
 
 
 def login_view(request):
@@ -39,6 +43,27 @@ def register_view(request):
             messages.error(request, 'Por favor, preencha todos os campos.')
     return render(request, 'accounts/register.html')
 
-
+@login_required
 def profile_view(request):
+    profile, created = Profile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST' and request.FILES.get('avatar'):
+        avatar_file = request.FILES['avatar']
+
+        try:
+            # Upload para Cloudinary
+            upload_result = cloudinary.uploader.upload(
+                avatar_file,
+                asset_folder='senacmon/avatars',
+                public_id=f'user_{request.user.id}',
+                overwrite=True,
+                resource_type='image'
+            )
+
+            profile.avatar_url = upload_result['secure_url']
+            profile.save()
+            messages.success(request, 'Avatar atualizado com sucesso!')
+        except Exception as e:
+            messages.error(request, f'Erro ao fazer upload do avatar: {str(e)}')
+
     return render(request, 'accounts/profile.html')

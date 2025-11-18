@@ -154,121 +154,93 @@
 <div class="trainer-wrapper">
   <div class="card trainer-card">
 
-    <div class="trainer-header">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
 
-      <div class="trainer-avatar-wrapper">
-        <label for="avatar-input" class="trainer-avatar-label">
-          <div class="trainer-avatar-circle">
-            <img id="trainer-avatar-img" src="" class="d-none" alt="Avatar">
-            <span id="trainer-avatar-fallback">
-              {{ user.username|slice:":1"|upper }}
-            </span>
-          </div>
-          <span class="change-avatar-text">Alterar avatar</span>
-        </label>
-        <input type="file" id="avatar-input" accept="image/*" class="d-none">
-      </div>
+      <div class="trainer-header">
 
-      <div>
-        <h1 class="h4 trainer-name mb-1">
-          {{ user.username }}
-        </h1>
-        <div class="trainer-meta">
-          {% if user.email %}
-            {{ user.email }}
-          {% else %}
-            E-mail não informado
-          {% endif %}
+        <div class="trainer-avatar-wrapper">
+          <label for="avatar-input" class="trainer-avatar-label">
+            <div class="trainer-avatar-circle">
+              {% if profile.avatar_url %}
+                <img id="trainer-avatar-img" src="{{ profile.avatar_url }}" alt="Avatar">
+              {% else %}
+                <span id="trainer-avatar-fallback">
+                  {{ user.username|slice:":1"|upper }}
+                </span>
+              {% endif %}
+            </div>
+            <span class="change-avatar-text">Alterar avatar</span>
+          </label>
+          <input type="file" id="avatar-input" name="avatar" accept="image/*" class="d-none">
         </div>
-        <span class="trainer-badge mt-2 d-inline-block">
-          Treinador Senacmon
-        </span>
-      </div>
-    </div>
 
-    <div class="trainer-stats">
-      <div class="trainer-pill">
-        <span class="label">Saldo de berries</span>
-        <span class="value">120</span>
+        <div>
+          <h1 class="h4 trainer-name mb-1">
+            {{ user.username }}
+          </h1>
+          <div class="trainer-meta">
+            {% if user.email %}
+              {{ user.email }}
+            {% else %}
+              E-mail não informado
+            {% endif %}
+          </div>
+          <span class="trainer-badge mt-2 d-inline-block">
+            Treinador Senacmon
+          </span>
+        </div>
       </div>
-      <div class="trainer-pill">
-        <span class="label">Nível</span>
-        <span class="value">1</span>
-      </div>
-      <div class="trainer-pill">
-        <span class="label">Partidas</span>
-        <span class="value">—</span>
-      </div>
-    </div>
 
-    <p class="trainer-description mt-3 mb-1">
-      Esse é o seu perfil de treinador no mundo Senacmon. Use suas berries com sabedoria,
-      escolha bem seus Pokémons iniciais e acompanhe aqui sua jornada pela arena.
-    </p>
+      <div class="trainer-stats">
+        <div class="trainer-pill">
+          <span class="label">Saldo de berries</span>
+          <span class="value">{{ profile.berries_cache }}</span>
+        </div>
+        <div class="trainer-pill">
+          <span class="label">Nível</span>
+          <span class="value">1</span>
+        </div>
+        <div class="trainer-pill">
+          <span class="label">Partidas</span>
+          <span class="value">—</span>
+        </div>
+      </div>
 
-    <div class="trainer-actions">
-      <button type="button" class="btn btn-outline-primary btn-edit-trainer">
-        Editar Perfil
-      </button>
-    </div>
+      <p class="trainer-description mt-3 mb-1">
+        Esse é o seu perfil de treinador no mundo Senacmon. Use suas berries com sabedoria,
+        escolha bem seus Pokémons iniciais e acompanhe aqui sua jornada pela arena.
+      </p>
+
+      <div class="trainer-actions">
+        <button type="button" class="btn btn-outline-primary btn-edit-trainer" onclick="document.getElementById('avatar-input').click()">
+          Escolher Avatar
+        </button>
+      </div>
+
+    </form>
 
   </div>
 </div>
 
 <script>
-  function aplicarAvatarNavbar(dataUrl) {
-    document.querySelectorAll(".js-user-avatar").forEach(function(el) {
-      if (!dataUrl) {
-        el.style.backgroundImage = "";
-        el.style.width = "";
-        el.style.height = "";
-        el.style.borderRadius = "";
-        el.style.display = "";
-        return;
-      }
-      el.textContent = "";
-      el.style.backgroundImage = "url(" + dataUrl + ")";
-      el.style.backgroundSize = "cover";
-      el.style.backgroundPosition = "center";
-      el.style.display = "inline-block";
-      el.style.width = "28px";
-      el.style.height = "28px";
-      el.style.borderRadius = "50%";
+    document.addEventListener("DOMContentLoaded", function() {
+        const input = document.querySelector("#avatar-input");
+
+        if(!input) return;
+
+       input.addEventListener("change", function(ev) {
+          const file = ev.target.files[0];
+          if(!file) return;
+
+          if(!file.type.startsWith("image/")) {
+              alert("Por favor, selecione uma imagem válida.")
+              return;
+          }
+
+          // Submit do form automaticamente após escolher a imagem
+           ev.target.closest('form').submit();
+       });
     });
-  }
-
-  document.addEventListener("DOMContentLoaded", function() {
-    var img = document.getElementById("trainer-avatar-img");
-    var fallback = document.getElementById("trainer-avatar-fallback");
-    var input = document.getElementById("avatar-input");
-
-    var storedImg = localStorage.getItem("senacmonAvatarImage");
-    if (storedImg) {
-      img.src = storedImg;
-      img.classList.remove("d-none");
-      fallback.classList.add("d-none");
-      aplicarAvatarNavbar(storedImg);
-    }
-
-    if (!input) return;
-
-    input.addEventListener("change", function(ev) {
-      var file = ev.target.files[0];
-      if (!file) return;
-      if (!file.type.startsWith("image/")) return;
-
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        var dataUrl = e.target.result;
-        localStorage.setItem("senacmonAvatarImage", dataUrl);
-        img.src = dataUrl;
-        img.classList.remove("d-none");
-        fallback.classList.add("d-none");
-        aplicarAvatarNavbar(dataUrl);
-      };
-      reader.readAsDataURL(file);
-    });
-  });
 </script>
-
 {% endblock %}

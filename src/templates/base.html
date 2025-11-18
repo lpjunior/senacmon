@@ -85,9 +85,13 @@
         {% if user.is_authenticated %}
 
           <li class="nav-item">
-            <span class="navbar-text js-user-avatar">
-              {{ user.username|slice:":1"|upper }}
-            </span>
+            <a href="{% url 'accounts:profile' %}" class="navbar-text js-user-avatar" style="text-decoration: none;">
+                {% if user.profile.avatar_url %}
+                    <img src="{{ user.profile.avatar_url }}" alt="Avatar" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover">
+                {% else %}
+                    {{ user.username|slice:':1'|upper }}
+                {% endif %}
+            </a>
           </li>
 
           <li class="nav-item">
